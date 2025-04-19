@@ -8,20 +8,65 @@ export const generateBitacoraEventoPdf = async (data: any) => {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
   const titleFontSize = 24;
-  const cellFontSize = 12;
-
+  const textFontSize = 12;
   let y = height - 80;
 
-  // Título
-  page.drawText("Bitácora de evento", {
-    x: 50,
-    y,
-    size: titleFontSize,
-    font,
-    color: rgb(0.2, 0.2, 0.6),
-  });
+  const title = "Bitácora de evento";
+  const maxTitleWidth = 495;
 
-  y -= 50;
+  const truncateText = (text: string, maxWidth: number, size: number) => {
+    let truncated = text;
+    while (font.widthOfTextAtSize(truncated, size) > maxWidth) {
+      if (truncated.length <= 1) return "...";
+      truncated = truncated.slice(0, -1);
+    }
+    return truncated !== text ? truncated + "..." : truncated;
+  };
+
+  const titleWidth = font.widthOfTextAtSize(title, titleFontSize);
+  if (titleWidth > maxTitleWidth) {
+    const splitIndex = Math.floor(title.length / 2);
+    const firstLine = truncateText(
+      title.slice(0, splitIndex),
+      maxTitleWidth,
+      titleFontSize
+    );
+    const secondLine = truncateText(
+      title.slice(splitIndex),
+      maxTitleWidth,
+      titleFontSize
+    );
+
+    page.drawText(firstLine, {
+      x: 50,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+
+    y -= 30;
+
+    page.drawText(secondLine, {
+      x: 50,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+
+    y -= 20;
+  } else {
+    page.drawText(title, {
+      x: 50,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+
+    y -= 50;
+  }
 
   const headers = [
     "Número Folio",
@@ -44,34 +89,10 @@ export const generateBitacoraEventoPdf = async (data: any) => {
   ];
 
   const startX = 50;
-  const colWidths = [150, 350];
+  const colWidths = [200, 300];
   const rowHeight = 30;
 
-  // Dibujar encabezado
-  for (let i = 0; i < 2; i++) {
-    const x = startX + (i === 0 ? 0 : colWidths[0]);
-    page.drawRectangle({
-      x,
-      y,
-      width: colWidths[i],
-      height: rowHeight,
-      color: rgb(0.9, 0.9, 0.95),
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 1,
-    });
-
-    page.drawText(i === 0 ? "Campo" : "Valor", {
-      x: x + 10,
-      y: y + 10,
-      size: cellFontSize,
-      font,
-      color: rgb(0, 0, 0.6),
-    });
-  }
-
-  y -= rowHeight;
-
-  // Dibujar filas
+  // Dibujar filas de datos
   for (let i = 0; i < headers.length; i++) {
     const rowY = y - i * rowHeight;
 
@@ -81,13 +102,20 @@ export const generateBitacoraEventoPdf = async (data: any) => {
       y: rowY,
       width: colWidths[0],
       height: rowHeight,
-      borderColor: rgb(0, 0, 0),
+      color: rgb(0.95, 0.95, 0.95),
+      borderColor: rgb(0.8, 0.8, 0.8),
       borderWidth: 1,
     });
-    page.drawText(headers[i], {
-      x: startX + 10,
-      y: rowY + 10,
-      size: cellFontSize,
+
+    const truncatedLabel = truncateText(
+      headers[i],
+      colWidths[0] - 10,
+      textFontSize
+    );
+    page.drawText(truncatedLabel, {
+      x: startX + 5,
+      y: rowY + 8,
+      size: textFontSize,
       font,
       color: rgb(0.2, 0.2, 0.2),
     });
@@ -98,13 +126,20 @@ export const generateBitacoraEventoPdf = async (data: any) => {
       y: rowY,
       width: colWidths[1],
       height: rowHeight,
-      borderColor: rgb(0, 0, 0),
+      color: rgb(1, 1, 1),
+      borderColor: rgb(0.8, 0.8, 0.8),
       borderWidth: 1,
     });
-    page.drawText(values[i], {
-      x: startX + colWidths[0] + 10,
-      y: rowY + 10,
-      size: cellFontSize,
+
+    const truncatedValue = truncateText(
+      values[i],
+      colWidths[1] - 10,
+      textFontSize
+    );
+    page.drawText(truncatedValue, {
+      x: startX + colWidths[0] + 5,
+      y: rowY + 8,
+      size: textFontSize,
       font,
       color: rgb(0, 0, 0),
     });
