@@ -1,103 +1,143 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { Toaster } from "react-hot-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import FormAlarmasDiarias from "@/components/forms/form-alarmas-diarias";
+import FormBitacoraEvento from "@/components/forms/form-bitacora-evento";
+import FormActivacionDesactivacion from "@/components/forms/form-activacion-desactivacion";
+import FormAlarmasRecientes from "@/components/forms/form-alarmas-recientes";
+import FormDetalleIncidencias from "@/components/forms/form-detalle-incidencias";
+import FormDispositivosVigencia from "@/components/forms/form-dispositivos-vigencia";
+import FormHistorialMonitoreo from "@/components/forms/form-historial-monitoreo";
+import FormIncumplimientos from "@/components/forms/form-incumplimientos";
+import FormHistorialSuspension from "@/components/forms/form-historial-suspension";
+import FormAlarmasRelevantes from "@/components/forms/form-alarmas-relevantes";
+import FormDesinstalacionesRealizadas from "@/components/forms/form-desinstalaciones-realizadas";
+import FormInstalacionesRealizadas from "@/components/forms/form-instalaciones-realizadas";
+import FormProximasInstalaciones from "@/components/forms/form-proximas-instalaciones";
+import FormProximasDesinstalaciones from "@/components/forms/form-proximas-desinstalaciones";
+import FormPersonasAlarma from "@/components/forms/form-personas-alarma";
+import FormPersonasDispositivo from "@/components/forms/form-personas-dispositivo";
+import FormVictimasVigencia from "@/components/forms/form-victimas-vigencia";
+import FormOperadoresAlarmas from "@/components/forms/form-operadores-alarmas";
+import FormProtocolosAlarma from "@/components/forms/form-protocolos-alarma";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [selectedForm, setSelectedForm] = useState("H3");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const formOptions = [
+    { value: "H1", label: "Bitácora de evento" },
+    { value: "H2", label: "Activación y desactivación" },
+    { value: "H3", label: "Alarmas diarias" },
+    { value: "H4", label: "Alarmas recientes" },
+    { value: "H5", label: "Detalle de incidencias de víctimas" },
+    { value: "H6", label: "Dispositivos en estado de vigencia" },
+    { value: "H7", label: "Historial de monitoreo" },
+    { value: "H8", label: "Incumplimientos" },
+    { value: "H9", label: "Historial de suspensión de alarmas" },
+    { value: "H10", label: "Alarmas Relevantes del periodo" },
+    { value: "H11", label: "Desisntalaciones realizadas" },
+    { value: "H12", label: "Instalaciones realizadas" },
+    { value: "H13", label: "Próximas Instalaciones" },
+    { value: "H14", label: "Próximas desinstalaciones" },
+    {
+      value: "H15",
+      label:
+        "Personas condenadas y personas sujetas a control que registraron alarma",
+    },
+    {
+      value: "H16",
+      label:
+        "Personas condenadas, personas sujetas a control con dispositivo y alarmas activas en el sistema",
+    },
+    { value: "H17", label: "Víctimas en estado de vigencia en el sistema" },
+    {
+      value: "H18",
+      label: "Operadores y alarmas trabajadas dentro de un periodo determinado",
+    },
+    /*     { value: "H20", label: "Protocolos asignados por tipo de alarma" }, */
+  ];
+
+  const renderForm = () => {
+    switch (selectedForm) {
+      case "H1":
+        return <FormBitacoraEvento />;
+      case "H2":
+        return <FormActivacionDesactivacion />;
+    /*   case "H3":
+        return <FormAlarmasDiarias />; */
+      case "H4":
+        return <FormAlarmasRecientes />;
+      case "H5":
+        return <FormDetalleIncidencias />;
+      case "H6":
+        return <FormDispositivosVigencia />;
+      case "H7":
+        return <FormHistorialMonitoreo />;
+      case "H8":
+        return <FormIncumplimientos />;
+      case "H9":
+        return <FormHistorialSuspension />;
+      case "H10":
+        return <FormAlarmasRelevantes />;
+      case "H11":
+        return <FormDesinstalacionesRealizadas />;
+      case "H12":
+        return <FormInstalacionesRealizadas />;
+      case "H13":
+        return <FormProximasInstalaciones />;
+      case "H14":
+        return <FormProximasDesinstalaciones />;
+      case "H15":
+        return <FormPersonasAlarma />;
+      case "H16":
+        return <FormPersonasDispositivo />;
+      case "H17":
+        return <FormVictimasVigencia />;
+      case "H18":
+        return <FormOperadoresAlarmas />;
+      /*    case "H20":
+        return <FormProtocolosAlarma />; */
+      default:
+        return <FormAlarmasDiarias />;
+    }
+  };
+
+  return (
+    <main className="mx-auto py-8 px-4 w-full h-screen flex justify-center items-center">
+      <Card className="w-[600px] max-h-[800px] overflow-auto">
+        <CardHeader>
+          <CardTitle>Sistema de Reportes</CardTitle>
+          <div className="mt-4">
+            <Select
+              value={selectedForm}
+              onValueChange={setSelectedForm}
+              defaultValue="H3"
+            >
+              <SelectTrigger className="w-full md:w-[400px]">
+                <SelectValue placeholder="Seleccione un formulario" />
+              </SelectTrigger>
+              <SelectContent>
+                {formOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        <CardContent>{renderForm()}</CardContent>
+      </Card>
+      <Toaster />
+    </main>
   );
 }
