@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { saveReport } from "@/functions";
 import toast from "react-hot-toast";
+import Link from "next/link";
+import { Link2 } from "lucide-react";
 
 export default function FormDatosJudiciales() {
   const [formData, setFormData] = useState({
@@ -35,13 +37,19 @@ export default function FormDatosJudiciales() {
 
   const handleGenerateReport = () => {
     saveReport("Alarmas diarias", formData);
+    localStorage.setItem("h0", JSON.stringify(formData));
     toast.success("Reporte generado");
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Alarmas diarias</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Alarmas diarias</CardTitle>
+          <Link href="/daily-alarms" target="_blank">
+            <Link2 />
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -70,7 +78,7 @@ export default function FormDatosJudiciales() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleGenerateReport}>Generar Reporte</Button>
+        <Button onClick={handleGenerateReport} className="cursor-pointer">Generar Reporte</Button>
       </CardFooter>
     </Card>
   );

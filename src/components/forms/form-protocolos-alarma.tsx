@@ -111,7 +111,7 @@ export default function FormProtocolosAlarma() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleGenerateReport} disabled={loading}>
+        <Button onClick={handleGenerateReport} className="cursor-pointer">
           {loading ? "Generando..." : "Generar Reporte"}
         </Button>
       </CardFooter>

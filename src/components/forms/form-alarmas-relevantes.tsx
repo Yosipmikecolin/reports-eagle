@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { saveReport } from "@/functions";
+import { Link2 } from "lucide-react";
+import Link from "next/link";
 
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -38,14 +40,19 @@ export default function FormAlarmasRelevantes() {
 
   const handleGenerateReport = () => {
     saveReport("Alarmas Relevantes del Periodo", formData);
+    localStorage.setItem("h10", JSON.stringify(formData));
     toast.success("Reporte generado");
   };
-
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Alarmas Relevantes del Periodo</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Alarmas Relevantes del Periodo</CardTitle>
+          <Link href="/relevant-alarms" target="_blank">
+            <Link2 />
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -144,7 +151,7 @@ export default function FormAlarmasRelevantes() {
         </div>
       </CardContent>
       <CardFooter>
-      <Button onClick={handleGenerateReport}>Generar Reporte</Button>
+        <Button onClick={handleGenerateReport} className="cursor-pointer">Generar Reporte</Button>
       </CardFooter>
     </Card>
   );

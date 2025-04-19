@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { saveReport } from "@/functions";
+import { Link2 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -44,12 +46,18 @@ export default function FormIncumplimientos() {
   };
   const handleGenerateReport = () => {
     saveReport("Incumplimientos", formData);
+    localStorage.setItem("h8", JSON.stringify(formData));
     toast.success("Reporte generado");
   };
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Incumplimientos</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Incumplimientos</CardTitle>
+          <Link href="/breach" target="_blank">
+            <Link2 />
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -163,7 +171,7 @@ export default function FormIncumplimientos() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleGenerateReport}>Generar Reporte</Button>
+        <Button onClick={handleGenerateReport} className="cursor-pointer">Generar Reporte</Button>
       </CardFooter>
     </Card>
   );

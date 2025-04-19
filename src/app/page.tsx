@@ -28,7 +28,6 @@ import FormPersonasAlarma from "@/components/forms/form-personas-alarma";
 import FormPersonasDispositivo from "@/components/forms/form-personas-dispositivo";
 import FormVictimasVigencia from "@/components/forms/form-victimas-vigencia";
 import FormOperadoresAlarmas from "@/components/forms/form-operadores-alarmas";
-import FormProtocolosAlarma from "@/components/forms/form-protocolos-alarma";
 
 export default function Home() {
   const [selectedForm, setSelectedForm] = useState("H3");

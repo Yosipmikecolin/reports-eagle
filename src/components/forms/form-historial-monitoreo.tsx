@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { saveReport } from "@/functions";
+import { Link2 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -37,13 +39,19 @@ export default function FormControlData() {
 
   const handleGenerateReport = () => {
     saveReport("Historial de monitoreo", formData);
+    localStorage.setItem("h7", JSON.stringify(formData));
     toast.success("Reporte generado");
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Historial de monitoreo</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Historial de monitoreo</CardTitle>
+          <Link href="/monitoring-history" target="_blank">
+            <Link2 />
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -146,7 +154,7 @@ export default function FormControlData() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleGenerateReport}>Generar Reporte</Button>
+        <Button onClick={handleGenerateReport} className="cursor-pointer">Generar Reporte</Button>
       </CardFooter>
     </Card>
   );
