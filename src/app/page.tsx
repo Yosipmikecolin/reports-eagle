@@ -112,7 +112,7 @@ export default function Home() {
 
   return (
     <main className="mx-auto py-8 px-4 w-full h-screen flex justify-center items-center">
-      <Card className="w-[600px] max-h-[800px] overflow-auto">
+      <Card className="max-h-[800px] overflow-auto">
         <CardHeader>
           <CardTitle>Sistema de Reportes</CardTitle>
           <div className="mt-4">

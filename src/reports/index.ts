@@ -1,183 +1,235 @@
 // reports/bitacoraEvento.ts
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
-export const generateBitacoraEventoPdf = async (data: any) => {
+export const generateBitacoraEventoPdf = async (
+  carrier: any,
+  data: any[],
+  title: string
+) => {
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // Tamaño A4
-  const { height } = page.getSize();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  const pageWidth = 595;
+  const pageHeight = 842;
+  const margin = 50;
 
   const titleFontSize = 24;
   const textFontSize = 12;
-  let y = height - 80;
+  const rowHeight = 30;
+  const labelWidth = 200;
+  const valueWidth = 300;
+  const startX = margin;
 
-  const title = "Bitácora de evento";
-  const maxTitleWidth = 495;
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
 
-  const truncateText = (text: string, maxWidth: number, size: number) => {
-    let truncated = text;
-    while (font.widthOfTextAtSize(truncated, size) > maxWidth) {
-      if (truncated.length <= 1) return "...";
-      truncated = truncated.slice(0, -1);
-    }
-    return truncated !== text ? truncated + "..." : truncated;
+  const drawTitle = () => {
+    page.drawText(title, {
+      x: startX,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+    y -= 50;
   };
 
-  const titleWidth = font.widthOfTextAtSize(title, titleFontSize);
-  if (titleWidth > maxTitleWidth) {
-    const splitIndex = Math.floor(title.length / 2);
-    const firstLine = truncateText(
-      title.slice(0, splitIndex),
-      maxTitleWidth,
-      titleFontSize
-    );
-    const secondLine = truncateText(
-      title.slice(splitIndex),
-      maxTitleWidth,
-      titleFontSize
-    );
+  const drawField = (label: string, value: string) => {
+    if (y < margin + rowHeight) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
 
-    page.drawText(firstLine, {
-      x: 50,
-      y,
-      size: titleFontSize,
-      font,
-      color: rgb(0.2, 0.2, 0.6),
-    });
-
-    y -= 30;
-
-    page.drawText(secondLine, {
-      x: 50,
-      y,
-      size: titleFontSize,
-      font,
-      color: rgb(0.2, 0.2, 0.6),
-    });
-
-    y -= 20;
-  } else {
-    page.drawText(title, {
-      x: 50,
-      y,
-      size: titleFontSize,
-      font,
-      color: rgb(0.2, 0.2, 0.6),
-    });
-
-    y -= 50;
-  }
-
-  const headers = [
-    "Número Folio",
-    "Nombre",
-    "RUC",
-    "RIT",
-    "ROL",
-    "Fecha de evento",
-    "Nombre alerta",
-  ];
-
-  const values = [
-    data.folio || "-",
-    data.nombre || "-",
-    data.ruc || "-",
-    data.rit || "-",
-    data.rol || "-",
-    data.fechaEvento || "-",
-    data.nombreAlerta || "-",
-  ];
-
-  const startX = 50;
-  const colWidths = [200, 300];
-  const rowHeight = 30;
-
-  // Dibujar filas de datos
-  for (let i = 0; i < headers.length; i++) {
-    const rowY = y - i * rowHeight;
-
-    // Columna: Campo
     page.drawRectangle({
       x: startX,
-      y: rowY,
-      width: colWidths[0],
+      y: y - 8,
+      width: labelWidth,
       height: rowHeight,
       color: rgb(0.95, 0.95, 0.95),
       borderColor: rgb(0.8, 0.8, 0.8),
       borderWidth: 1,
     });
 
-    const truncatedLabel = truncateText(
-      headers[i],
-      colWidths[0] - 10,
-      textFontSize
-    );
-    page.drawText(truncatedLabel, {
-      x: startX + 5,
-      y: rowY + 8,
-      size: textFontSize,
-      font,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-
-    // Columna: Valor
     page.drawRectangle({
-      x: startX + colWidths[0],
-      y: rowY,
-      width: colWidths[1],
+      x: startX + labelWidth,
+      y: y - 8,
+      width: valueWidth,
       height: rowHeight,
       color: rgb(1, 1, 1),
       borderColor: rgb(0.8, 0.8, 0.8),
       borderWidth: 1,
     });
 
-    const truncatedValue = truncateText(
-      values[i],
-      colWidths[1] - 10,
-      textFontSize
-    );
-    page.drawText(truncatedValue, {
-      x: startX + colWidths[0] + 5,
-      y: rowY + 8,
+    page.drawText(label, {
+      x: startX + 5,
+      y: y + 5,
+      size: textFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+
+    page.drawText(value || "-", {
+      x: startX + labelWidth + 5,
+      y: y + 5,
       size: textFontSize,
       font,
       color: rgb(0, 0, 0),
     });
-  }
 
+    y -= rowHeight;
+  };
+
+  /*   const reportFields = [
+    { label: "Número Folio", key: "folio" },
+    { label: "Nombre", key: "nombre" },
+    { label: "RUC", key: "ruc" },
+    { label: "RIT", key: "rit" },
+    { label: "ROL", key: "rol" },
+  ]; */
+
+  const dataFields = [
+    { label: "Número Folio", key: "folio" },
+    { label: "Nombre", key: "nombre" },
+    { label: "RUC", key: "ruc" },
+    { label: "RIT", key: "rit" },
+    { label: "ROL", key: "rol" },
+    { label: "Fecha de evento", key: "fechaEvento" },
+    { label: "Nombre alerta", key: "nombreAlerta" },
+    // Agrega aquí los campos que debe tener cada evento en `data`
+  ];
+
+  // === Título principal ===
+  drawTitle();
+
+  // === Datos del evento (encabezado) ===
+  /*   reportFields.forEach(({ label, key }) => {
+    drawField(label, carrier[key]);
+  }); */
+
+  y -= 20;
+
+  // === Iterar sobre la lista data (bitácora de eventos) ===
+  data.forEach((item, index) => {
+    if (y < margin + rowHeight * (dataFields.length + 1)) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    page.drawText(`Registro ${index + 1}`, {
+      x: startX,
+      y,
+      size: textFontSize,
+      font,
+      color: rgb(0.1, 0.1, 0.4),
+    });
+
+    y -= rowHeight;
+
+    dataFields.forEach(({ label, key }) => {
+      drawField(label, item[key]);
+    });
+
+    y -= 10;
+  });
+
+  // === Guardar y retornar URL ===
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
   return url;
 };
 
-export const generateCarrier = async (data: any) => {
+export const generateCarrier = async (
+  data: any[],
+  title: string
+) => {
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // Tamaño A4
-  const { height, width } = page.getSize();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  const pageWidth = 595;
+  const pageHeight = 842;
+  const margin = 50;
 
   const titleFontSize = 24;
   const textFontSize = 12;
-  let y = height - 80;
-
-  // Título
-  page.drawText("Alarmas diarias", {
-    x: 50,
-    y,
-    size: titleFontSize,
-    font,
-    color: rgb(0.2, 0.2, 0.6),
-  });
-
-  y -= 50;
-
   const rowHeight = 30;
   const labelWidth = 200;
   const valueWidth = 300;
-  const startX = 50;
+  const startX = margin;
 
-  const fields: { label: string; key: keyof typeof data }[] = [
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
+
+  const drawTitle = () => {
+    page.drawText(title, {
+      x: startX,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+    y -= 50;
+  };
+
+  const drawField = (label: string, value: string) => {
+    if (y < margin + rowHeight) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    // Label background
+    page.drawRectangle({
+      x: startX,
+      y: y - 8,
+      width: labelWidth,
+      height: rowHeight,
+      color: rgb(0.95, 0.95, 0.95),
+      borderColor: rgb(0.8, 0.8, 0.8),
+      borderWidth: 1,
+    });
+
+    // Value background
+    page.drawRectangle({
+      x: startX + labelWidth,
+      y: y - 8,
+      width: valueWidth,
+      height: rowHeight,
+      color: rgb(1, 1, 1),
+      borderColor: rgb(0.8, 0.8, 0.8),
+      borderWidth: 1,
+    });
+
+    // Label text
+    page.drawText(label, {
+      x: startX + 5,
+      y: y + 5,
+      size: textFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+
+    // Value text
+    page.drawText(value || "-", {
+      x: startX + labelWidth + 5,
+      y: y + 5,
+      size: textFontSize,
+      font,
+      color: rgb(0, 0, 0),
+    });
+
+    y -= rowHeight;
+  };
+
+  /*   const carrierFields = [
+    { label: "Número Folio", key: "folio" },
+    { label: "Nombre", key: "nombre" },
+    { label: "RUN", key: "run" },
+    { label: "RUC", key: "ruc" },
+    { label: "RIT", key: "rit" },
+    { label: "ROL", key: "rol" },
+  ]; */
+
+  const dataFields = [
     { label: "Número Folio", key: "folio" },
     { label: "Nombre", key: "nombre" },
     { label: "RUN", key: "run" },
@@ -187,13 +239,88 @@ export const generateCarrier = async (data: any) => {
     { label: "Tribunal", key: "tribunal" },
     { label: "Pena sustitutiva", key: "pena" },
     { label: "CRS", key: "crs" },
-    { label: "Comuna", key: "comuna" },
+    { label: "Fecha alarma", key: "fechaAlarma" },
+    { label: "Nombre usuario", key: "nombreUsuario" },
+    { label: "Resultado de la gestión", key: "resultado" },
   ];
 
-  fields.forEach(({ label, key }) => {
-    const value = data[key] || "-";
+  // === Título principal ===
+  drawTitle();
 
-    // Dibujar fondo tipo celda
+  // === Datos del carrier (encabezado) ===
+  /*   carrierFields.forEach(({ label, key }) => {
+    drawField(label, carrier[key]);
+  }); */
+
+  y -= 20;
+
+  // === Iterar sobre la lista data ===
+  data.forEach((item, index) => {
+    if (y < margin + rowHeight * (dataFields.length + 1)) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    page.drawText(`Registro ${index + 1}`, {
+      x: startX,
+      y,
+      size: textFontSize,
+      font,
+      color: rgb(0.1, 0.1, 0.4),
+    });
+
+    y -= rowHeight;
+
+    dataFields.forEach(({ label, key }) => {
+      drawField(label, item[key]);
+    });
+
+    y -= 10;
+  });
+
+  // === Guardar y retornar URL ===
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  return url;
+};
+
+export const generateH2 = async (data: any[], title: string) => {
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  const pageWidth = 595;
+  const pageHeight = 842;
+  const margin = 50;
+
+  const titleFontSize = 24;
+  const textFontSize = 12;
+  const rowHeight = 30;
+  const labelWidth = 200;
+  const valueWidth = 300;
+  const startX = margin;
+
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
+
+  const drawTitle = () => {
+    page.drawText(title, {
+      x: startX,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+    y -= 50;
+  };
+
+  const drawField = (label: string, value: string) => {
+    if (y < margin + rowHeight) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    // Label background
     page.drawRectangle({
       x: startX,
       y: y - 8,
@@ -204,6 +331,7 @@ export const generateCarrier = async (data: any) => {
       borderWidth: 1,
     });
 
+    // Value background
     page.drawRectangle({
       x: startX + labelWidth,
       y: y - 8,
@@ -214,7 +342,7 @@ export const generateCarrier = async (data: any) => {
       borderWidth: 1,
     });
 
-    // Texto etiqueta
+    // Label text
     page.drawText(label, {
       x: startX + 5,
       y: y + 5,
@@ -223,8 +351,8 @@ export const generateCarrier = async (data: any) => {
       color: rgb(0.2, 0.2, 0.2),
     });
 
-    // Texto valor
-    page.drawText(value, {
+    // Value text
+    page.drawText(value || "-", {
       x: startX + labelWidth + 5,
       y: y + 5,
       size: textFontSize,
@@ -233,59 +361,112 @@ export const generateCarrier = async (data: any) => {
     });
 
     y -= rowHeight;
-  });
+  };
 
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  return url;
-};
+  /*   const carrierFields = [
+    { label: "Número Folio", key: "folio" },
+    { label: "Nombre", key: "nombre" },
+    { label: "RUN", key: "run" },
+    { label: "RUC", key: "ruc" },
+    { label: "RIT", key: "rit" },
+    { label: "ROL", key: "rol" },
+  ]; */
 
-export const generateH2 = async (data: any) => {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // Tamaño A4
-  const { height } = page.getSize();
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-  const titleFontSize = 24;
-  const textFontSize = 12;
-  let y = height - 80;
-
-  // Título
-  page.drawText("Activación / Desactivación de Medida", {
-    x: 50,
-    y,
-    size: titleFontSize,
-    font,
-    color: rgb(0.2, 0.2, 0.6),
-  });
-
-  y -= 50;
-
-  const rowHeight = 30;
-  const labelWidth = 200;
-  const valueWidth = 300;
-  const startX = 50;
-
-  const fields: { label: string; key: keyof typeof data }[] = [
+  const dataFields = [
     { label: "Número Folio", key: "folio" },
     { label: "Nombre", key: "nombre" },
     { label: "RUC", key: "ruc" },
     { label: "RIT", key: "rit" },
     { label: "ROL", key: "rol" },
     { label: "Tribunal", key: "tribunal" },
-    { label: "Pena sustitutiva o medida a controlar", key: "pena" },
+    { label: "Pena sustitutiva", key: "pena" },
     { label: "CRS", key: "crs" },
     { label: "Fecha activación", key: "fechaActivacion" },
     { label: "Fecha desactivación", key: "fechaDesactivacion" },
     { label: "Motivo activación", key: "motivoActivacion" },
     { label: "Motivo desactivación", key: "motivoDesactivacion" },
+    { label: "CRS", key: "crs" },
   ];
 
-  fields.forEach(({ label, key }) => {
-    const value = data[key] || "-";
 
-    // Celda de etiqueta
+  // === Título principal ===
+  drawTitle();
+
+  // === Datos del carrier (encabezado) ===
+  /*   carrierFields.forEach(({ label, key }) => {
+    drawField(label, carrier[key]);
+  }); */
+
+  y -= 20;
+console.log("data",data)
+  // === Iterar sobre la lista data ===
+  data?.forEach((item, index) => {
+    if (y < margin + rowHeight * (dataFields.length + 1)) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    page.drawText(`Registro ${index + 1}`, {
+      x: startX,
+      y,
+      size: textFontSize,
+      font,
+      color: rgb(0.1, 0.1, 0.4),
+    });
+
+    y -= rowHeight;
+
+    dataFields.forEach(({ label, key }) => {
+      drawField(label, item[key]);
+    });
+
+    y -= 10;
+  });
+
+  // === Guardar y retornar URL ===
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  return url;
+};
+
+
+export const generateH4 = async (data: any[],title:string) => {
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  const pageWidth = 595;
+  const pageHeight = 842;
+  const margin = 50;
+
+  const titleFontSize = 24;
+  const textFontSize = 12;
+  const rowHeight = 30;
+  const labelWidth = 200;
+  const valueWidth = 300;
+  const startX = margin;
+
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
+
+  const drawTitle = () => {
+    page.drawText(title, {
+      x: startX,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+    y -= 50;
+  };
+
+  const drawField = (label: string, value: string) => {
+    if (y < margin + rowHeight) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    // Label background
     page.drawRectangle({
       x: startX,
       y: y - 8,
@@ -296,7 +477,7 @@ export const generateH2 = async (data: any) => {
       borderWidth: 1,
     });
 
-    // Celda de valor
+    // Value background
     page.drawRectangle({
       x: startX + labelWidth,
       y: y - 8,
@@ -307,7 +488,7 @@ export const generateH2 = async (data: any) => {
       borderWidth: 1,
     });
 
-    // Texto etiqueta
+    // Label text
     page.drawText(label, {
       x: startX + 5,
       y: y + 5,
@@ -316,8 +497,8 @@ export const generateH2 = async (data: any) => {
       color: rgb(0.2, 0.2, 0.2),
     });
 
-    // Texto valor
-    page.drawText(value, {
+    // Value text
+    page.drawText(value || "-", {
       x: startX + labelWidth + 5,
       y: y + 5,
       size: textFontSize,
@@ -326,41 +507,18 @@ export const generateH2 = async (data: any) => {
     });
 
     y -= rowHeight;
-  });
+  };
 
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  return url;
-};
+  /*   const carrierFields = [
+    { label: "Número Folio", key: "folio" },
+    { label: "Nombre", key: "nombre" },
+    { label: "RUN", key: "run" },
+    { label: "RUC", key: "ruc" },
+    { label: "RIT", key: "rit" },
+    { label: "ROL", key: "rol" },
+  ]; */
 
-export const generateH4 = async (data: any) => {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // Tamaño A4
-  const { height } = page.getSize();
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-  const titleFontSize = 24;
-  const textFontSize = 12;
-  let y = height - 80;
-
-  // Título
-  page.drawText("Alarmas Recientes", {
-    x: 50,
-    y,
-    size: titleFontSize,
-    font,
-    color: rgb(0.2, 0.2, 0.6),
-  });
-
-  y -= 50;
-
-  const rowHeight = 30;
-  const labelWidth = 200;
-  const valueWidth = 300;
-  const startX = 50;
-
-  const fields: { label: string; key: keyof typeof data }[] = [
+  const dataFields = [
     { label: "Número Folio", key: "folio" },
     { label: "Nombre", key: "nombre" },
     { label: "RUC", key: "ruc" },
@@ -373,10 +531,84 @@ export const generateH4 = async (data: any) => {
     { label: "Resultado de la gestión", key: "resultadoGestion" },
   ];
 
-  fields.forEach(({ label, key }) => {
-    const value = data[key] || "-";
 
-    // Celda de etiqueta
+  // === Título principal ===
+  drawTitle();
+
+  // === Datos del carrier (encabezado) ===
+  /*   carrierFields.forEach(({ label, key }) => {
+    drawField(label, carrier[key]);
+  }); */
+
+  y -= 20;
+console.log("data",data)
+  // === Iterar sobre la lista data ===
+  data?.forEach((item, index) => {
+    if (y < margin + rowHeight * (dataFields.length + 1)) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    page.drawText(`Registro ${index + 1}`, {
+      x: startX,
+      y,
+      size: textFontSize,
+      font,
+      color: rgb(0.1, 0.1, 0.4),
+    });
+
+    y -= rowHeight;
+
+    dataFields.forEach(({ label, key }) => {
+      drawField(label, item[key]);
+    });
+
+    y -= 10;
+  });
+
+  // === Guardar y retornar URL ===
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  return url;
+};
+
+export const generateH5 = async (data: any[],title:string) => {
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  const pageWidth = 595;
+  const pageHeight = 842;
+  const margin = 50;
+
+  const titleFontSize = 24;
+  const textFontSize = 12;
+  const rowHeight = 30;
+  const labelWidth = 200;
+  const valueWidth = 300;
+  const startX = margin;
+
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
+
+  const drawTitle = () => {
+    page.drawText(title, {
+      x: startX,
+      y,
+      size: titleFontSize,
+      font,
+      color: rgb(0.2, 0.2, 0.6),
+    });
+    y -= 50;
+  };
+
+  const drawField = (label: string, value: string) => {
+    if (y < margin + rowHeight) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    // Label background
     page.drawRectangle({
       x: startX,
       y: y - 8,
@@ -387,7 +619,7 @@ export const generateH4 = async (data: any) => {
       borderWidth: 1,
     });
 
-    // Celda de valor
+    // Value background
     page.drawRectangle({
       x: startX + labelWidth,
       y: y - 8,
@@ -398,7 +630,7 @@ export const generateH4 = async (data: any) => {
       borderWidth: 1,
     });
 
-    // Texto etiqueta
+    // Label text
     page.drawText(label, {
       x: startX + 5,
       y: y + 5,
@@ -407,8 +639,8 @@ export const generateH4 = async (data: any) => {
       color: rgb(0.2, 0.2, 0.2),
     });
 
-    // Texto valor
-    page.drawText(value, {
+    // Value text
+    page.drawText(value || "-", {
       x: startX + labelWidth + 5,
       y: y + 5,
       size: textFontSize,
@@ -417,41 +649,18 @@ export const generateH4 = async (data: any) => {
     });
 
     y -= rowHeight;
-  });
+  };
 
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  return url;
-};
+  /*   const carrierFields = [
+    { label: "Número Folio", key: "folio" },
+    { label: "Nombre", key: "nombre" },
+    { label: "RUN", key: "run" },
+    { label: "RUC", key: "ruc" },
+    { label: "RIT", key: "rit" },
+    { label: "ROL", key: "rol" },
+  ]; */
 
-export const generateH5 = async (data: any) => {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // Tamaño A4
-  const { height } = page.getSize();
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-  const titleFontSize = 24;
-  const textFontSize = 12;
-  let y = height - 80;
-
-  // Título
-  page.drawText("Detalle de Incidencias de Víctimas", {
-    x: 50,
-    y,
-    size: titleFontSize,
-    font,
-    color: rgb(0.2, 0.2, 0.6),
-  });
-
-  y -= 50;
-
-  const rowHeight = 30;
-  const labelWidth = 200;
-  const valueWidth = 300;
-  const startX = 50;
-
-  const fields: { label: string; key: keyof typeof data }[] = [
+  const dataFields = [
     { label: "Número Folio", key: "folio" },
     { label: "Nombre persona sujeta a control", key: "nombrePersona" },
     { label: "Nombre víctima", key: "nombreVictima" },
@@ -459,7 +668,7 @@ export const generateH5 = async (data: any) => {
     { label: "RIT", key: "rit" },
     { label: "ROL", key: "rol" },
     { label: "Tribunal", key: "tribunal" },
-    { label: "Pena sustitutiva o medida a controlar", key: "penaSustitutiva" },
+    { label: "Pena sustitutiva o medida", key: "penaSustitutiva" },
     { label: "CRS", key: "crs" },
     { label: "Fecha de incidencia", key: "fechaIncidencia" },
     { label: "Tipo de incidencia", key: "tipoIncidencia" },
@@ -467,52 +676,42 @@ export const generateH5 = async (data: any) => {
     { label: "Resultado de la gestión", key: "resultadoGestion" },
   ];
 
-  fields.forEach(({ label, key }) => {
-    const value = data[key] || "-";
 
-    // Celda de etiqueta
-    page.drawRectangle({
+  // === Título principal ===
+  drawTitle();
+
+  // === Datos del carrier (encabezado) ===
+  /*   carrierFields.forEach(({ label, key }) => {
+    drawField(label, carrier[key]);
+  }); */
+
+  y -= 20;
+console.log("data",data)
+  // === Iterar sobre la lista data ===
+  data?.forEach((item, index) => {
+    if (y < margin + rowHeight * (dataFields.length + 1)) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - margin;
+    }
+
+    page.drawText(`Registro ${index + 1}`, {
       x: startX,
-      y: y - 8,
-      width: labelWidth,
-      height: rowHeight,
-      color: rgb(0.95, 0.95, 0.95),
-      borderColor: rgb(0.8, 0.8, 0.8),
-      borderWidth: 1,
-    });
-
-    // Celda de valor
-    page.drawRectangle({
-      x: startX + labelWidth,
-      y: y - 8,
-      width: valueWidth,
-      height: rowHeight,
-      color: rgb(1, 1, 1),
-      borderColor: rgb(0.8, 0.8, 0.8),
-      borderWidth: 1,
-    });
-
-    // Texto etiqueta
-    page.drawText(label, {
-      x: startX + 5,
-      y: y + 5,
+      y,
       size: textFontSize,
       font,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-
-    // Texto valor
-    page.drawText(value, {
-      x: startX + labelWidth + 5,
-      y: y + 5,
-      size: textFontSize,
-      font,
-      color: rgb(0, 0, 0),
+      color: rgb(0.1, 0.1, 0.4),
     });
 
     y -= rowHeight;
+
+    dataFields.forEach(({ label, key }) => {
+      drawField(label, item[key]);
+    });
+
+    y -= 10;
   });
 
+  // === Guardar y retornar URL ===
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
