@@ -57,7 +57,6 @@ export default function FormDetalleIncidencias() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [carrier, setCarrier] = useState<any>();
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -66,7 +65,6 @@ export default function FormDetalleIncidencias() {
 
   const handlePortadorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = portadores.find((p) => p.id === e.target.value);
-    setCarrier(selected);
     if (selected) {
       setFormData((prev) => ({
         ...prev,

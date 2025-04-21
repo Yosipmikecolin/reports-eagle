@@ -171,7 +171,9 @@ export default function FormDatosJudiciales() {
                   id={id}
                   value={(formData as any)[id]}
                   onChange={handleChange}
-                  type={id === "fechaAlarma" ? "date" : "text"}
+                  type={
+                    ["fechaAlarma"].includes(id) ? "datetime-local" : "text"
+                  }
                   readOnly={[
                     "folio",
                     "nombre",

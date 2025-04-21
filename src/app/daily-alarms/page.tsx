@@ -34,7 +34,7 @@ export default function Page() {
     try {
       const url = await generateCarrier(report, "Alarmas diarias");
 
-      const fileName = `Alarmas_diarias_${report.carrier?.folio || "N/A"}.pdf`;
+      const fileName = "alarmas_diarias.pdf";
 
       if (url) {
         downloadPDF(url, fileName);
