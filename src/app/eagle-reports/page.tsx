@@ -28,16 +28,16 @@ export default function PdfViewerPage() {
   const [type, setType] = useState("");
   const [data, setData] = useState<any>(null);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const reportString = localStorage.getItem("report-eagle");
     if (reportString) {
       const report = JSON.parse(reportString);
       setType(report.type);
       setData(report.body);
     }
-  }, []);
+  }, []); */
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const generate = async () => {
       if (!type || !data) {
         const url = await generateEmpty();
@@ -144,7 +144,7 @@ export default function PdfViewerPage() {
 
     generate();
   }, [type, data]);
-
+ */
   return (
     <div style={{ width: "100%", height: "100vh" }}>
       {pdfUrl ? (
