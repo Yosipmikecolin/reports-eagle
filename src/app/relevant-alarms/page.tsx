@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generateH10 } from "@/reports";
+import { exportToExcel } from "@/reports"; // asegúrate de que exportToExcel está bien exportada
 
 export default function Page() {
   const [reportDownloaded, setReportDownloaded] = useState(false);
@@ -13,7 +13,7 @@ export default function Page() {
     if (reportString) {
       try {
         const report = JSON.parse(reportString);
-        generatePDF(report);
+        generateExcel(report); // Cambiado de generatePDF a generateExcel
       } catch (error) {
         console.error("Error al parsear el reporte:", error);
         setNoReportFound(true);
@@ -23,27 +23,12 @@ export default function Page() {
     }
   }, []);
 
-  const downloadPDF = (url: string, filename: string) => {
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-  };
-
-  const generatePDF = async (report: any) => {
+  const generateExcel = (report: any) => {
     try {
-      const url = await generateH10(report, "Alarmas Relevantes del periodo");
-
-      const fileName = "alarmas_relevantes.pdf";
-
-      if (url) {
-        downloadPDF(url, fileName);
-        setReportDownloaded(true);
-      } else {
-        setNoReportFound(true);
-      }
+      exportToExcel(report, "alarmas_relevantes_periodo");
+      setReportDownloaded(true);
     } catch (error) {
-      console.error("Error generando el PDF:", error);
+      console.error("Error generando el Excel:", error);
       setNoReportFound(true);
     }
   };
@@ -61,7 +46,7 @@ export default function Page() {
             alignItems: "center",
           }}
         >
-          📄 Reporte descargado exitosamente.
+          📊 Reporte descargado exitosamente.
         </p>
       ) : noReportFound ? (
         <p

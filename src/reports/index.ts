@@ -1,5 +1,6 @@
 // reports/bitacoraEvento.ts
 import { PDFDocument, PDFFont, rgb, StandardFonts } from "pdf-lib";
+import * as XLSX from 'xlsx';
 
 export const generateBitacoraEventoPdf = async (
   data: any[],
@@ -1248,84 +1249,7 @@ export const generateH9 = async (data: any[], title: string) => {
   return url;
 };
 
-export const generateH10 = async (data: any[], title: string) => {
-  const pdfDoc = await PDFDocument.create();
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-  const pageWidth = 595;
-  const pageHeight = 842;
-  const margin = 50;
-
-  const titleFontSize = 24;
-  const textFontSize = 12;
-  const rowHeight = 30;
-  const labelWidth = 200;
-  const valueWidth = 300;
-  const startX = margin;
-
-  let page = pdfDoc.addPage([pageWidth, pageHeight]);
-  let y = pageHeight - margin;
-
-  const drawTitle = () => {
-    page.drawText(title, {
-      x: startX,
-      y,
-      size: titleFontSize,
-      font,
-      color: rgb(0.2, 0.2, 0.6),
-    });
-    y -= 50;
-  };
-
-  const drawField = (label: string, value: string) => {
-    if (y < margin + rowHeight) {
-      page = pdfDoc.addPage([pageWidth, pageHeight]);
-      y = pageHeight - margin;
-    }
-
-    // Label background
-    page.drawRectangle({
-      x: startX,
-      y: y - 8,
-      width: labelWidth,
-      height: rowHeight,
-      color: rgb(0.95, 0.95, 0.95),
-      borderColor: rgb(0.8, 0.8, 0.8),
-      borderWidth: 1,
-    });
-
-    // Value background
-    page.drawRectangle({
-      x: startX + labelWidth,
-      y: y - 8,
-      width: valueWidth,
-      height: rowHeight,
-      color: rgb(1, 1, 1),
-      borderColor: rgb(0.8, 0.8, 0.8),
-      borderWidth: 1,
-    });
-
-    // Label text
-    page.drawText(label, {
-      x: startX + 5,
-      y: y + 5,
-      size: textFontSize,
-      font,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-
-    // Value text
-    page.drawText(value || "-", {
-      x: startX + labelWidth + 5,
-      y: y + 5,
-      size: textFontSize,
-      font,
-      color: rgb(0, 0, 0),
-    });
-
-    y -= rowHeight;
-  };
-
+export const exportToExcel = (data: any[], title: string) => {
   const dataFields = [
     { label: "Número Folio", key: "folio" },
     { label: "Nombre", key: "nombre" },
@@ -1341,40 +1265,31 @@ export const generateH10 = async (data: any[], title: string) => {
     { label: "Resultado de la gestión", key: "resultadoGestion" },
   ];
 
-  // === Título principal ===
-  drawTitle();
-
-  y -= 20;
-  console.log("data", data);
-  // === Iterar sobre la lista data ===
-  data?.forEach((item, index) => {
-    if (y < margin + rowHeight * (dataFields.length + 1)) {
-      page = pdfDoc.addPage([pageWidth, pageHeight]);
-      y = pageHeight - margin;
-    }
-
-    page.drawText(`Registro ${index + 1}`, {
-      x: startX,
-      y,
-      size: textFontSize,
-      font,
-      color: rgb(0.1, 0.1, 0.4),
-    });
-
-    y -= rowHeight;
-
+  // Convertimos el array de objetos en un array de objetos con etiquetas legibles
+  const formattedData = data.map(item => {
+    const formatted: Record<string, any> = {};
     dataFields.forEach(({ label, key }) => {
-      drawField(label, item[key]);
+      formatted[label] = item[key] ?? "-";
     });
-
-    y -= 10;
+    return formatted;
   });
 
-  // === Guardar y retornar URL ===
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const worksheet = XLSX.utils.json_to_sheet(formattedData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, title || "Datos");
+
+  // Generar un archivo y crear un blob para descarga
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+  // Crear URL para descarga
   const url = URL.createObjectURL(blob);
-  return url;
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${title || "datos"}.xlsx`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 export const generateH11 = async (data: any[], title: string) => {
