@@ -48,7 +48,9 @@ export default function FormDatosJudiciales() {
         ruc: string;
         rit: string;
         rol: string;
+        crs: string;
         tribunal: string;
+        pena: string;
       }[]
   >([]);
 
@@ -70,6 +72,8 @@ export default function FormDatosJudiciales() {
         rit: item.carrier.cause.rit,
         rol: item.carrier.cause.rol,
         tribunal: item.carrier.cause.court,
+        crs: item.carrier.cause.crs,
+        pena: item.carrier.cause.penatype,
       }));
 
       setPortadores(mapCarrier);
@@ -95,6 +99,9 @@ export default function FormDatosJudiciales() {
         ...prev,
         folio: selected.folio,
         nombre: selected.nombre,
+        tribunal: selected.tribunal,
+        penaSustitutiva: selected.pena,
+        crs: selected.crs,
         run: selected.run,
         ruc: selected.ruc,
         rit: selected.rit,
@@ -116,10 +123,11 @@ export default function FormDatosJudiciales() {
     }
     setFormData((prev) => ({
       ...prev,
-      tribunal: "",
-      pena: "",
-      crs: "",
-      comuna: "",
+      fechaInicio: "",
+      diasControlados: "",
+      fechaTermino: "",
+      nDispositivo: "",
+      nombrePersonaCondena: "",
     }));
   };
 
@@ -185,6 +193,13 @@ export default function FormDatosJudiciales() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { id: "folio", label: "Número Folio" },
+              { id: "nDispositivo", label: "N Dispositivo" },
+              { id: "nombreVictima", label: "Nombre de la víctima" },
+              { id: "runVictima", label: "RUN de la víctima" },
+              {
+                id: "nombrePersonaCondena",
+                label: "Nombre de persona condenada",
+              },
               { id: "ruc", label: "RUC" },
               { id: "rit", label: "RIT" },
               { id: "rol", label: "ROL" },
@@ -194,13 +209,12 @@ export default function FormDatosJudiciales() {
                 label: "Pena sustitutiva o medida a controlar",
               },
               { id: "crs", label: "CRS" },
-              { id: "nDispositivo", label: "CRS" },
-              { id: "nombreVictima", label: "Fecha de alarma" },
-              { id: "runVictima", label: "Fecha de alarma" },
-              { id: "nombrePersonaCondena", label: "Nombre de usuario" },
-              { id: "fechaInicio", label: "Resultado de la gestión" },
-              { id: "diasControlados", label: "Resultado de la gestión" },
-              { id: "fechaTermino", label: "Resultado de la gestión" },
+              { id: "fechaInicio", label: "Fecha inicio de control" },
+              {
+                id: "diasControlados",
+                label: "N de días efectivamente controlados",
+              },
+              { id: "fechaTermino", label: "Fecha de termino de control" },
             ].map(({ id, label }) => (
               <div className="space-y-2" key={id}>
                 <Label htmlFor={id}>{label}</Label>

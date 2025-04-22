@@ -19,12 +19,12 @@ import { getRequest } from "@/api/request";
 export default function FormDatosJudiciales() {
   const initialForm = {
     folio: "",
+    nDispositivo: "",
     nombre: "",
     ruc: "",
     rit: "",
     rol: "",
     tribunal: "",
-    nDispositivo: "",
     penaSustitutiva: "",
     crs: "",
     fechaSuspension: "",
@@ -45,7 +45,9 @@ export default function FormDatosJudiciales() {
         ruc: string;
         rit: string;
         rol: string;
+        crs: string;
         tribunal: string;
+        pena: string;
       }[]
   >([]);
 
@@ -67,6 +69,8 @@ export default function FormDatosJudiciales() {
         rit: item.carrier.cause.rit,
         rol: item.carrier.cause.rol,
         tribunal: item.carrier.cause.court,
+        crs: item.carrier.cause.crs,
+        pena: item.carrier.cause.penatype,
       }));
 
       setPortadores(mapCarrier);
@@ -93,6 +97,8 @@ export default function FormDatosJudiciales() {
         folio: selected.folio,
         nombre: selected.nombre,
         tribunal: selected.tribunal,
+        penaSustitutiva: selected.pena,
+        crs: selected.crs,
         run: selected.run,
         ruc: selected.ruc,
         rit: selected.rit,
@@ -114,10 +120,9 @@ export default function FormDatosJudiciales() {
     }
     setFormData((prev) => ({
       ...prev,
-      tribunal: "",
-      pena: "",
-      crs: "",
-      comuna: "",
+      fechaSuspension: "",
+      motivoSuspension: "",
+      nDispositivo: "",
     }));
   };
 
@@ -183,19 +188,25 @@ export default function FormDatosJudiciales() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { id: "folio", label: "Número Folio" },
+              { id: "nDispositivo", label: "N de dipositivo" },
               { id: "nombre", label: "Nombre" },
               { id: "ruc", label: "RUC" },
               { id: "rit", label: "RIT" },
               { id: "rol", label: "ROL" },
               { id: "tribunal", label: "Tribunal" },
-              { id: "nDispositivo", label: "N de dipositivo" },
-              { id: "crs", label: "CRS" },
               {
                 id: "penaSustitutiva",
                 label: "Pena sustitutiva o medida a controlar",
               },
-              { id: "fechaSuspension", label: "Resultado de la gestión" },
-              { id: "motivoSuspension", label: "Nombre de usuario" },
+              { id: "crs", label: "CRS" },
+              {
+                id: "fechaSuspension",
+                label: "Fecha de suspensión de la alarma",
+              },
+              {
+                id: "motivoSuspension",
+                label: "Motivo de la suspensión de la alarma",
+              },
             ].map(({ id, label }) => (
               <div className="space-y-2" key={id}>
                 <Label htmlFor={id}>{label}</Label>
