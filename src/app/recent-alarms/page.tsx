@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generateH2, generateH4 } from "@/reports";
+import { generateH4 } from "@/reports";
 
 export default function Page() {
   const [noReportFound, setNoReportFound] = useState(false);
@@ -13,7 +13,6 @@ export default function Page() {
     if (reportString) {
       try {
         const report = JSON.parse(reportString);
-        console.log("report", report);
         generatePDF(report);
       } catch (error) {
         console.error("Error al parsear el reporte:", error);
@@ -35,7 +34,7 @@ export default function Page() {
     try {
       const url = await generateH4(data, "Alarmas recientes");
       if (url) {
-        const fileName = `AlarmasRecientes.pdf`;
+        const fileName = `alarmasRecientes.pdf`;
         downloadPDF(url, fileName);
         setReportDownloaded(true);
       } else {

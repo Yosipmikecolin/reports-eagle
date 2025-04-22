@@ -2,7 +2,6 @@
 import { PDFDocument, PDFFont, rgb, StandardFonts } from "pdf-lib";
 
 export const generateBitacoraEventoPdf = async (
-  carrier: any,
   data: any[],
   title: string
 ) => {

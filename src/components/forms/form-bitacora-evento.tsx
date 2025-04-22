@@ -50,7 +50,6 @@ export default function FormBitacoraEvento() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [carrier, setCarrier] = useState<any>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -59,7 +58,6 @@ export default function FormBitacoraEvento() {
 
   const handlePortadorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = portadores.find((p) => p.id === e.target.value);
-    setCarrier(selected);
     if (selected) {
       setFormData((prev) => ({
         ...prev,
@@ -106,12 +104,7 @@ export default function FormBitacoraEvento() {
   };
 
   const handleGenerateReport = () => {
-    const reportData = {
-      carrier,
-      data: formDataList,
-    };
-    saveReport("Bitácora de Evento", reportData);
-    localStorage.setItem("h1", JSON.stringify(reportData));
+    localStorage.setItem("h1", JSON.stringify(formDataList));
     toast.success("Reporte generado");
   };
 
@@ -155,15 +148,17 @@ export default function FormBitacoraEvento() {
               { id: "rol", label: "ROL" },
               { id: "fechaEvento", label: "Fecha de evento", type: "date" },
               { id: "nombreAlerta", label: "Nombre alerta" },
-            ].map(({ id, label, type = "text" }) => (
+            ].map(({ id, label}) => (
               <div className="space-y-2" key={id}>
                 <Label htmlFor={id}>{label}</Label>
                 <Input
                   id={id}
                   value={(formData as any)[id]}
                   onChange={handleChange}
-                  type={type}
-                  readOnly={["folio", "nombre", "ruc", "rit", "rol"].includes(id)}
+                  type={id === "fechaEvento" ? "datetime-local" : "text"}
+                  readOnly={["folio", "nombre", "ruc", "rit", "rol"].includes(
+                    id
+                  )}
                 />
               </div>
             ))}

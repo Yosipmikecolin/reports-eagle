@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generateBitacoraEventoPdf, generateEmpty } from "@/reports";
+import { generateBitacoraEventoPdf } from "@/reports";
 
 export default function Page() {
   const [reportDownloaded, setReportDownloaded] = useState(false);
@@ -34,13 +34,9 @@ export default function Page() {
 
   const generatePDF = async (report: any) => {
     try {
-      const url = await generateBitacoraEventoPdf(
-        report.carrier,
-        report.data,
-        "Bitácora de evento"
-      );
+      const url = await generateBitacoraEventoPdf(report, "Bitácora de evento");
 
-      const fileName = `Bitácora_evento_${report.carrier?.folio || "N/A"}.pdf`;
+      const fileName = `bitácora_evento.pdf`;
 
       if (url) {
         downloadPDF(url, fileName);

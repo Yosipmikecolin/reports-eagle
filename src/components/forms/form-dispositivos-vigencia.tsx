@@ -60,7 +60,6 @@ export default function FormControlData() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [carrier, setCarrier] = useState<any>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -69,7 +68,6 @@ export default function FormControlData() {
 
   const handleCarrierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = portadores.find((p) => p.id === e.target.value);
-    setCarrier(selected);
     if (selected) {
       setFormData((prev) => ({
         ...prev,
@@ -190,7 +188,11 @@ export default function FormControlData() {
               <Label htmlFor={id}>{label}</Label>
               <Input
                 id={id}
-                type={type}
+                type={
+                  ["fechaInicio", "fechaTermino"].includes(id)
+                    ? "datetime-local"
+                    : "text"
+                }
                 value={(formData as any)[id]}
                 onChange={handleChange}
               />

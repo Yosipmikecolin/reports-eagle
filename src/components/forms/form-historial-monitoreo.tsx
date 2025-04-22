@@ -164,7 +164,10 @@ export default function FormDatosJudiciales() {
               { id: "crs", label: "CRS" },
               { id: "fechaInicio", label: "Fecha inicio de control" },
               { id: "nDispositivo", label: "N° de dispositivo" },
-              { id: "diasControlados", label: "N de días efectivamente controlados" },
+              {
+                id: "diasControlados",
+                label: "N de días efectivamente controlados",
+              },
               { id: "fechaTermino", label: "Resultado de la gestión" },
             ].map(({ id, label }) => (
               <div className="space-y-2" key={id}>
@@ -173,7 +176,11 @@ export default function FormDatosJudiciales() {
                   id={id}
                   value={(formData as any)[id]}
                   onChange={handleChange}
-                  type={id === "fechaInicio" ? "date" : "text"}
+                  type={
+                    ["fechaInicio", "fechaTermino"].includes(id)
+                      ? "datetime-local"
+                      : "text"
+                  }
                   readOnly={[
                     "folio",
                     "nombre",

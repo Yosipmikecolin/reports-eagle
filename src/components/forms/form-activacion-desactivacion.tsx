@@ -155,7 +155,7 @@ export default function FormActivacionDesactivacion() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[ 
+            {[
               { id: "folio", label: "Número Folio" },
               { id: "nombre", label: "Nombre" },
               { id: "run", label: "RUN" },
@@ -176,8 +176,19 @@ export default function FormActivacionDesactivacion() {
                   id={id}
                   value={(formData as any)[id]}
                   onChange={handleChange}
-                  type={(id === "fechaDesactivacion" || id === "fechaActivacion") ? "date" : "text"}
-                  readOnly={["folio", "nombre", "run", "ruc", "rit", "rol"].includes(id)} // Solo lectura en estos campos
+                  type={
+                    id === "fechaDesactivacion" || id === "fechaActivacion"
+                      ? "datetime-local"
+                      : "text"
+                  }
+                  readOnly={[
+                    "folio",
+                    "nombre",
+                    "run",
+                    "ruc",
+                    "rit",
+                    "rol",
+                  ].includes(id)} // Solo lectura en estos campos
                 />
               </div>
             ))}
@@ -188,7 +199,10 @@ export default function FormActivacionDesactivacion() {
           <Button onClick={handleAddRegistro} variant={"outline"}>
             {editIndex !== null ? "Guardar edición" : "Agregar registro"}
           </Button>
-          <Button onClick={handleGenerateReport} disabled={!formDataList.length}>
+          <Button
+            onClick={handleGenerateReport}
+            disabled={!formDataList.length}
+          >
             Generar Reporte
           </Button>
         </CardFooter>

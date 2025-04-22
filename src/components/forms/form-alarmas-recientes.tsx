@@ -56,7 +56,6 @@ export default function FormDatosJudiciales() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [carrier, setCarrier] = useState<any>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -65,7 +64,6 @@ export default function FormDatosJudiciales() {
 
   const handlePortadorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = portadores.find((p) => p.id === e.target.value);
-    setCarrier(selected);
     if (selected) {
       setFormData((prev) => ({
         ...prev,
@@ -174,7 +172,7 @@ export default function FormDatosJudiciales() {
                   id={id}
                   value={(formData as any)[id]}
                   onChange={handleChange}
-                  type={id === "fecha" ? "date" : "text"}
+                  type={id === "fecha" ? "datetime-local" : "text"}
                   readOnly={[
                     "folio",
                     "nombre",

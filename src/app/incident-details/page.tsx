@@ -13,7 +13,6 @@ export default function Page() {
     if (reportString) {
       try {
         const report = JSON.parse(reportString);
-        console.log("report", report);
         generatePDF(report);
       } catch (error) {
         console.error("Error al parsear el reporte:", error);
@@ -35,7 +34,7 @@ export default function Page() {
     try {
       const url = await generateH5(data, "Detalle de incidencias de víctimas");
       if (url) {
-        const fileName = `IncidenciasVíctima.pdf`;
+        const fileName = `incidenciasVíctima.pdf`;
         downloadPDF(url, fileName);
         setReportDownloaded(true);
       } else {

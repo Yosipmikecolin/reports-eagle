@@ -57,7 +57,7 @@ export default function FormDetalleIncidencias() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
@@ -159,9 +159,16 @@ export default function FormDetalleIncidencias() {
               { id: "rol", label: "ROL" },
               { id: "nombreVictima", label: "Nombre víctima" },
               { id: "tribunal", label: "Tribunal" },
-              { id: "penaSustitutiva", label: "Pena sustitutiva o medida a controlar" },
+              {
+                id: "penaSustitutiva",
+                label: "Pena sustitutiva o medida a controlar",
+              },
               { id: "crs", label: "CRS" },
-              { id: "fechaIncidencia", label: "Fecha de incidencia", type: "date" },
+              {
+                id: "fechaIncidencia",
+                label: "Fecha de incidencia",
+                type: "date",
+              },
               { id: "tipoIncidencia", label: "Tipo de incidencia" },
               { id: "nombreUsuario", label: "Nombre usuario" },
               { id: "resultadoGestion", label: "Resultado de la gestión" },
@@ -170,10 +177,18 @@ export default function FormDetalleIncidencias() {
                 <Label htmlFor={id}>{label}</Label>
                 <Input
                   id={id}
-                  type={type || "text"}
+                  type={
+                    ["fechaIncidencia"].includes(id) ? "datetime-local" : "text"
+                  }
                   value={(formData as any)[id]}
                   onChange={handleChange}
-                  readOnly={["folio", "nombrePersona","ruc","rit","rol"].includes(id)}
+                  readOnly={[
+                    "folio",
+                    "nombrePersona",
+                    "ruc",
+                    "rit",
+                    "rol",
+                  ].includes(id)}
                 />
               </div>
             ))}
@@ -184,7 +199,10 @@ export default function FormDetalleIncidencias() {
           <Button onClick={handleAddRegistro} variant={"outline"}>
             {editIndex !== null ? "Guardar edición" : "Agregar registro"}
           </Button>
-          <Button onClick={handleGenerateReport} disabled={!formDataList.length}>
+          <Button
+            onClick={handleGenerateReport}
+            disabled={!formDataList.length}
+          >
             Generar Reporte
           </Button>
         </CardFooter>

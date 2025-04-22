@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generateCarrier, generateH11 } from "@/reports";
+import { generateH11 } from "@/reports";
 
 export default function Page() {
   const [reportDownloaded, setReportDownloaded] = useState(false);

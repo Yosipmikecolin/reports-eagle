@@ -35,7 +35,7 @@ export default function Page() {
     try {
       const url = await generateH2(data, "Activación y Desactivación");
       if (url) {
-        const fileName = `Activaciones.pdf`;
+        const fileName = `activaciones.pdf`;
         downloadPDF(url, fileName);
         setReportDownloaded(true);
       } else {
