@@ -47,6 +47,8 @@ export default function FormDatosJudiciales() {
         rit: string;
         rol: string;
         tribunal: string;
+        pena: string;
+        crs: string;
       }[]
   >([]);
 
@@ -68,6 +70,8 @@ export default function FormDatosJudiciales() {
         rit: item.carrier.cause.rit,
         rol: item.carrier.cause.rol,
         tribunal: item.carrier.cause.court,
+        crs: item.carrier.cause.crs,
+        pena: item.carrier.cause.penatype,
       }));
 
       setPortadores(mapCarrier);
@@ -92,8 +96,10 @@ export default function FormDatosJudiciales() {
       setFormData((prev) => ({
         ...prev,
         folio: selected.folio,
-        tribunal: selected.tribunal,
         nombre: selected.nombre,
+        tribunal: selected.tribunal,
+        penaSustitutiva: selected.pena,
+        crs: selected.crs,
         run: selected.run,
         ruc: selected.ruc,
         rit: selected.rit,
@@ -184,6 +190,7 @@ export default function FormDatosJudiciales() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { id: "folio", label: "Número Folio" },
+              { id: "nDispositivo", label: "N de dispositivo" },
               { id: "nombre", label: "Nombre" },
               { id: "run", label: "RUN" },
               { id: "ruc", label: "RUC" },
@@ -195,7 +202,6 @@ export default function FormDatosJudiciales() {
                 label: "Pena sustitutiva o medida a controlar",
               },
               { id: "crs", label: "CRS" },
-              { id: "nDispositivo", label: "Fecha de alarma" },
               { id: "comuna", label: "Comuna" },
               {
                 id: "fechaHoraDesinstalacion",

@@ -48,6 +48,8 @@ export default function FormDatosJudiciales() {
         rit: string;
         rol: string;
         tribunal: string;
+        pena: string;
+        crs: string;
       }[]
   >([]);
 
@@ -69,6 +71,8 @@ export default function FormDatosJudiciales() {
         rit: item.carrier.cause.rit,
         rol: item.carrier.cause.rol,
         tribunal: item.carrier.cause.court,
+        crs: item.carrier.cause.crs,
+        pena: item.carrier.cause.penatype,
       }));
 
       setPortadores(mapCarrier);
@@ -99,6 +103,8 @@ export default function FormDatosJudiciales() {
         ruc: selected.ruc,
         rit: selected.rit,
         rol: selected.rol,
+        pena: selected.pena,
+        crs: selected.crs,
       }));
     }
   };
@@ -185,6 +191,7 @@ export default function FormDatosJudiciales() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { id: "folio", label: "Número Folio" },
+              { id: "nDispositivo", label: "N° de dispositivo" },
               { id: "nombre", label: "Nombre" },
               { id: "run", label: "RUN" },
               { id: "ruc", label: "RUC" },
@@ -194,12 +201,11 @@ export default function FormDatosJudiciales() {
               { id: "pena", label: "Pena sustitutiva o medida a controlar" },
               { id: "crs", label: "CRS" },
               { id: "fechaInicio", label: "Fecha inicio de control" },
-              { id: "nDispositivo", label: "N° de dispositivo" },
               {
                 id: "diasControlados",
                 label: "N de días efectivamente controlados",
               },
-              { id: "fechaTermino", label: "Resultado de la gestión" },
+              { id: "fechaTermino", label: "Fecha de termino de control" },
             ].map(({ id, label }) => (
               <div className="space-y-2" key={id}>
                 <Label htmlFor={id}>{label}</Label>
