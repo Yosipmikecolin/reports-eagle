@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { Link2, Trash2, Pencil } from "lucide-react";
+import { Link2, Trash2, Pencil, RefreshCcw } from "lucide-react";
 import { saveReport } from "@/functions";
 import { getRequest } from "@/api/request";
 
@@ -38,6 +38,7 @@ export default function FormControlData() {
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(false);
   const [portadores, setPortadores] = useState<
     | {
         id: string;
@@ -81,14 +82,14 @@ export default function FormControlData() {
 
   useEffect(() => {
     getPortadores();
-  }, []);
+  }, [reload]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleCarrierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePortadorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = portadores.find((p) => p.id === e.target.value);
     if (selected) {
       setFormData((prev) => ({
@@ -157,25 +158,29 @@ export default function FormControlData() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="portador">Seleccionar portador</Label>
-            <select
-              id="portador"
-              onChange={handleCarrierChange}
-              className="w-full border rounded px-2 py-1"
-              defaultValue=""
-            >
-              <option value="" disabled={loading}>
-                {loading ? "Cargando..." : "Selecciona un portador"}
-              </option>
-              {portadores.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nombre}
+          <div className="flex items-center justify-between gap-5">
+            <div className="space-y-2">
+              <Label htmlFor="portador">Seleccionar portador</Label>
+              <select
+                id="portador"
+                onChange={handlePortadorChange}
+                className="w-full border rounded px-2 py-1"
+                defaultValue=""
+              >
+                <option value="" disabled={loading}>
+                  {loading ? "Cargando..." : "Selecciona un portador"}
                 </option>
-              ))}
-            </select>
+                {portadores.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button onClick={() => setReload((prev) => !prev)}>
+              <RefreshCcw />
+            </Button>
           </div>
-
           {[
             { id: "nDispositivo", label: "N° de dispositivo" },
             { id: "nombre", label: "Nombre" },
