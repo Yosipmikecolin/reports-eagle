@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,28 +14,7 @@ import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { Link2, Trash2, Pencil } from "lucide-react";
-
-// Simulación de portadores
-const portadores = [
-  {
-    id: "1",
-    nombre: "Juan Pérez",
-    folio: "123",
-    run: "11111111sdasdads-1",
-    ruc: "987654321",
-    rit: "RIT001",
-    rol: "ROL123",
-  },
-  {
-    id: "2",
-    nombre: "Ana Gómez",
-    folio: "456",
-    run: "22222222-2",
-    ruc: "123456789",
-    rit: "RIT002",
-    rol: "ROL456",
-  },
-];
+import { getRequest } from "@/api/request";
 
 export default function FormActivacionDesactivacion() {
   const initialForm = {
@@ -57,7 +36,51 @@ export default function FormActivacionDesactivacion() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [carrier, setCarrier] = useState<any>(); // Estado para el portador seleccionado
+  const [loading, setLoading] = useState(false);
+  const [portadores, setPortadores] = useState<
+    | {
+        id: string;
+        nombre: string;
+        folio: string;
+        run: string;
+        ruc: string;
+        rit: string;
+        rol: string;
+        tribunal: string;
+      }[]
+  >([]);
+
+  const getPortadores = async () => {
+    try {
+      setLoading(true);
+      const result = await getRequest();
+      const mapCarrier = result.map((item) => ({
+        id: item._id,
+        nombre:
+          item.carrier.personalData.socialName +
+          " " +
+          item.carrier.personalData.paternalSurname +
+          " " +
+          item.carrier.personalData.motherSurname,
+        folio: item.folio + "",
+        run: item.carrier.personalData.run,
+        ruc: item.carrier.cause.ruc,
+        rit: item.carrier.cause.rit,
+        rol: item.carrier.cause.rol,
+        tribunal: item.carrier.cause.court,
+      }));
+
+      setPortadores(mapCarrier);
+    } catch (error) {
+      toast.error("No hay portadores creados");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getPortadores();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -65,13 +88,13 @@ export default function FormActivacionDesactivacion() {
   };
 
   const handlePortadorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = portadores.find((p) => p.id === e.target.value);
-    setCarrier(selected);
+    const selected = portadores?.find((p) => p.id === e.target.value);
     if (selected) {
       setFormData((prev) => ({
         ...prev,
         folio: selected.folio,
         nombre: selected.nombre,
+        tribunal:selected.tribunal,
         run: selected.run,
         ruc: selected.ruc,
         rit: selected.rit,
@@ -143,8 +166,8 @@ export default function FormActivacionDesactivacion() {
               className="w-full border rounded px-2 py-1"
               defaultValue=""
             >
-              <option value="" disabled>
-                Selecciona un portador
+              <option value="" disabled={loading}>
+                {loading ? "Cargando..." : "Selecciona un portador"}
               </option>
               {portadores.map((p) => (
                 <option key={p.id} value={p.id}>

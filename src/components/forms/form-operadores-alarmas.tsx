@@ -15,27 +15,6 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { Link2, Trash2, Pencil } from "lucide-react";
 
-// Simulación de portadores
-const portadores = [
-  {
-    id: "1",
-    nombre: "Juan Pérez",
-    folio: "123",
-    run: "11111111sdasdads-1",
-    ruc: "987654321",
-    rit: "RIT001",
-    rol: "ROL123",
-  },
-  {
-    id: "2",
-    nombre: "Ana Gómez",
-    folio: "456",
-    run: "22222222-2",
-    ruc: "123456789",
-    rit: "RIT002",
-    rol: "ROL456",
-  },
-];
 
 export default function FormDatosJudiciales() {
   const initialForm = {
@@ -48,6 +27,7 @@ export default function FormDatosJudiciales() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));

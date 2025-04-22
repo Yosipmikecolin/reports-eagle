@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,30 +15,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { Link2, Trash2, Pencil } from "lucide-react";
 import { saveReport } from "@/functions";
-
-// Simulación de portadores
-const portadores = [
-  {
-    id: "1",
-    nombre: "Carlos Díaz",
-    folio: "A001",
-    run: "12345678-9",
-    ruc: "100200300",
-    rit: "RT001",
-    rol: "R001",
-    tribunal: "Tribunal 1",
-  },
-  {
-    id: "2",
-    nombre: "Lucía Torres",
-    folio: "B002",
-    run: "98765432-1",
-    ruc: "400500600",
-    rit: "RT002",
-    rol: "R002",
-    tribunal: "Tribunal 2",
-  },
-];
+import { getRequest } from "@/api/request";
 
 const initialForm = {
   nDispositivo: "",
@@ -60,6 +37,51 @@ export default function FormControlData() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [portadores, setPortadores] = useState<
+    | {
+        id: string;
+        nombre: string;
+        folio: string;
+        run: string;
+        ruc: string;
+        rit: string;
+        rol: string;
+        tribunal: string;
+      }[]
+  >([]);
+
+  const getPortadores = async () => {
+    try {
+      setLoading(true);
+      const result = await getRequest();
+      const mapCarrier = result.map((item) => ({
+        id: item._id,
+        nombre:
+          item.carrier.personalData.socialName +
+          " " +
+          item.carrier.personalData.paternalSurname +
+          " " +
+          item.carrier.personalData.motherSurname,
+        folio: item.folio + "",
+        run: item.carrier.personalData.run,
+        ruc: item.carrier.cause.ruc,
+        rit: item.carrier.cause.rit,
+        rol: item.carrier.cause.rol,
+        tribunal: item.carrier.cause.court,
+      }));
+
+      setPortadores(mapCarrier);
+    } catch (error) {
+      toast.error("No hay portadores creados");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getPortadores();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -143,8 +165,8 @@ export default function FormControlData() {
               className="w-full border rounded px-2 py-1"
               defaultValue=""
             >
-              <option value="" disabled>
-                Selecciona un portador
+              <option value="" disabled={loading}>
+                {loading ? "Cargando..." : "Selecciona un portador"}
               </option>
               {portadores.map((p) => (
                 <option key={p.id} value={p.id}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { Link2, Pencil, Trash2 } from "lucide-react";
 import { saveReport } from "@/functions";
+import { getRequest } from "@/api/request";
 
 // Simulación de portadores
 const portadores = [
@@ -50,6 +51,49 @@ export default function FormBitacoraEvento() {
   const [formData, setFormData] = useState(initialForm);
   const [formDataList, setFormDataList] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [portadores, setPortadores] = useState<
+    | {
+        id: string;
+        nombre: string;
+        folio: string;
+        run: string;
+        ruc: string;
+        rit: string;
+        rol: string;
+      }[]
+  >([]);
+
+  const getPortadores = async () => {
+    try {
+      setLoading(true);
+      const result = await getRequest();
+      const mapCarrier = result.map((item) => ({
+        id: item._id,
+        nombre:
+          item.carrier.personalData.socialName +
+          " " +
+          item.carrier.personalData.paternalSurname +
+          " " +
+          item.carrier.personalData.motherSurname,
+        folio: item.folio + "",
+        run: item.carrier.personalData.run,
+        ruc: item.carrier.cause.ruc,
+        rit: item.carrier.cause.rit,
+        rol: item.carrier.cause.rol,
+      }));
+
+      setPortadores(mapCarrier);
+    } catch (error) {
+      toast.error("No hay portadores creados");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getPortadores();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -128,8 +172,8 @@ export default function FormBitacoraEvento() {
               className="w-full border rounded px-2 py-1"
               defaultValue=""
             >
-              <option value="" disabled>
-                Selecciona un portador
+              <option value="" disabled={loading}>
+                {loading ? "Cargando..." : "Selecciona un portador"}
               </option>
               {portadores.map((p) => (
                 <option key={p.id} value={p.id}>
